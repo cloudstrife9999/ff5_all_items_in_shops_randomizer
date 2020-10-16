@@ -1,0 +1,8 @@
+*.txt
+*.pyc
+__pycache__
+.vscode
+.directory
+*.smc
+*.srm
+*.zst
