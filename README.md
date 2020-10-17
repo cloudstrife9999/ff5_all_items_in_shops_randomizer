@@ -37,3 +37,11 @@ This randomiser is not compatible with any of the following versions of Final Fa
 * The original Japanese version for SNES.
 
 The compatibility with any other version (e.g., a [Career Day](https://www.bigbridge.studio/careerday/) modded ROM) is to be determined.
+
+## HOWTO
+
+Run the following command, and follow the resulting instructions
+
+```console
+python3 shop_randomiser.py
+```
