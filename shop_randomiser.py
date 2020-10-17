@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-from mappings import shop_type_flag_memory_locations, shop_types, useful_shop_types, missable_shops_type_addresses
+from mappings import shop_type_flag_memory_locations, shop_types, useful_shop_types, missable_shops_type_addresses, shared_shops
 from mappings import weapon_codes, armor_codes, accessory_codes, item_codes, magic_codes, job_codes
 from mappings import weapons, armors, accessories, items, spells, jobs
 
@@ -94,15 +94,31 @@ def generate_spoiler_log() -> List[str]:
             spoiler_log.append(location + ":")
 
             for shop_type_name, shop_type_address in shops.items():
-                spoiler_log.append("    originally: {} - now: {}:".format(shop_type_name, hex(ff5_bytes[shop_type_address])))
+                new_shop_type_name: str = next(k for k, v in shop_types.items() if v == ff5_bytes[shop_type_address])
+
+                spoiler_log.append("    originally: {} - now: {}:".format(shop_type_name, new_shop_type_name))
 
                 for good_code in [ff5_bytes[i] for i in range(shop_type_address + 1, shop_type_address + 9)]:
                     good_name: str = get_good_name_from_code_and_type(good_code=good_code, shop_type_address=shop_type_address)
                     spoiler_log.append("        {}".format(good_name))
+            
+                spoiler_log.append("    ----------")
+            spoiler_log += append_shared_shops(location)
 
     spoiler_log += append_dummy_shops_data()
 
     return spoiler_log
+
+
+def append_shared_shops(location: str) -> List[str]:
+    to_return: list[str] = []
+
+    if location in shared_shops.keys():
+        for shop in shared_shops[location]:
+            to_return.append("    {}".format(shop))
+            to_return.append("    ----------")
+
+    return to_return
 
 
 def append_dummy_shops_data() -> List[str]:

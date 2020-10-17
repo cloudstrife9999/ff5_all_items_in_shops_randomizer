@@ -553,7 +553,7 @@ shop_type_flag_memory_locations: Dict[str, Dict[str, Union[int, Dict[str, int]]]
     "walse": {
         "weapon": 0x112D88,
         "armor": 0x112D91,
-        # item -> walse item shop.
+        # item -> carwen item shop.
         "magic": 0x112D9A
     },
     "karnak": {
@@ -561,9 +561,9 @@ shop_type_flag_memory_locations: Dict[str, Dict[str, Union[int, Dict[str, int]]]
         "weapon_2": 0x112DAC, # Available after the Karnak castle blows up.
         "armor": 0x112DB5, # Available after being arrested.
         "item": 0x112DBE, # Available after being arrested.
-        "magic_1": 0x112DC7, # Available after being arrested. TODO: check white/black/dimen.
-        "magic_2": 0x112DD0, # Available after being arrested.TODO: check white/black/dimen.
-        "magic_3": 0x112DD9, # Available after being arrested.TODO: check white/black/dimen.
+        "black_magic": 0x112DC7, # Available after being arrested.
+        "white_magic": 0x112DD0, # Available after being arrested.
+        "dimen_magic": 0x112DD9, # Available after being arrested.
         "weapon_before_arrest": 0x112F6E,
         "armor_before_arrest": 0x112F77
     },
@@ -571,18 +571,18 @@ shop_type_flag_memory_locations: Dict[str, Dict[str, Union[int, Dict[str, int]]]
         "weapon": 0x112DE2,
         "armor": 0x112DEB,
         # item -> karnak item shop.
-        # magic -> karnak magic_X shop TODO: check which magic shop.
+        # magic -> karnak black_magic shop.
     },
     "istory": {
         "accessory": 0x112DFD
         # item -> karnak item shop.
-        # magic -> karnak magic_X shop TODO: check which magic shop.
+        # magic -> karnak dimen_magic shop.
     },
     "jacole": {
         "weapon": 0x112E18,
         "armor": 0x112E21,
         # item -> karnak item shop
-        # magic -> karnak magic_X shop TODO: check which magic shop.
+        # magic -> karnak white_magic shop.
     },
     "lix": {
         "throwable": 0x112E33,
@@ -615,9 +615,9 @@ shop_type_flag_memory_locations: Dict[str, Dict[str, Union[int, Dict[str, int]]]
         # armor_2 --> bal armor shop.
         # item_1 -> regole item_1 shop.
         # item_2 -> regole item_2 shop.
-        "magic_1": 0x112E8D, #TODO: check white/black/dimen.
-        "magic_2": 0x112E96, #TODO: check white/black/dimen.
-        "magic_3": 0x112E9F #TODO: check white/black/dimen.
+        "white_magic": 0x112E8D,
+        "black_magic": 0x112E96,
+        "dimen_magic": 0x112E9F
     },
     "surgate": {
         "weapon": 0x112EA8,
@@ -633,9 +633,9 @@ shop_type_flag_memory_locations: Dict[str, Dict[str, Union[int, Dict[str, int]]]
         "armor": 0x112EC3,
         # item_1 -> regole item_1 shop.
         # item_2 -> regole item_2 shop.
-        "magic_1": 0x112ECC,
-        "magic_2": 0x112ED5,
-        "magic_3": 0x112EDE
+        "white_magic": 0x112ECC,
+        "black_magic": 0x112ED5,
+        "dimen_magic": 0x112EDE
     },
     "trench": {
         "weapon": 0x112F0B,
@@ -646,8 +646,8 @@ shop_type_flag_memory_locations: Dict[str, Dict[str, Union[int, Dict[str, int]]]
         "throwable": 0x112F2F,
         "armor": 0x112F38,
         "accessory": 0x112F41,
-        "magic_1": 0x112F4A, # Level 6 spells.
-        "magic_2": 0x112F53, # Level 1/2/3 spells and Level 1 summons.
+        "level_6_magic": 0x112F4A, # Level 6 spells.
+        "missable_magic": 0x112F53, # Level 1/2/3 spells and Level 1 summons.
         "item_top": 0x112F5C,
         "item_bottom": 0x112F65
     },
@@ -669,5 +669,55 @@ shop_type_flag_memory_locations: Dict[str, Dict[str, Union[int, Dict[str, int]]]
         }
     }
 }
+
+
+# Note: not all the shops that sell the same goods are shared - e.g., Bal's weapon shop vs Regole's weapon shop.
+shared_shops: Dict[str, List[str]] = {
+    "walse": [
+        "originally: item - now: see carwen's original item shop"
+    ],
+    "crescent": [
+        "originally: item - now: see karnak's original item shop",
+        "originally: black_magic: - now: see karnak's original black_magic shop"
+    ],
+    "istory": [
+        "originally: item - now: see karnak's original item shop",
+        "originally: dimen_magic: - now: see karnak's original dimen_magic shop"
+    ],
+    "jacole": [
+        "originally: item - now: see karnak's original item shop",
+        "originally: white_magic: - now: see karnak's original white_magic shop"
+    ],
+    "regole": [
+        "originally: white_magic - now: see kelb's original white_magic shop",
+        "originally: black_magic - now: see kelb's original black_magic shop",
+        "originally: dimen_magic - now: see kelb's original dimen_magic shop"
+    ],
+    "bal": [
+        "originally: item_1 - now: see regole's original item_1 shop",
+        "originally: item_2 - now: see regole's original item_2 shop",
+        "originally: white_magic - now: see kelb's original white_magic shop",
+        "originally: black_magic - now: see kelb's original black_magic shop",
+        "originally: dimen_magic - now: see kelb's original dimen_magic shop"
+    ],
+    "kelb": [
+        "originally: item_1 - now: see regole's original item_1 shop",
+        "originally: item_2 - now: see regole's original item_2 shop",
+        "originally: weapon_2 - now: see bal's original weapon_1 shop", # Not a mistake: weapon_2/weapon_1.
+        "originally: armor_2 - now: see bal's original armor_1 shop" # Not a mistake: armor_2/armor_1.
+    ],
+    "surgate": [
+        "originally: item_1 - now: see regole's original item_1 shop",
+        "originally: item_2 - now: see regole's original item_2 shop",
+        "originally: white_magic - now: see kelb's original white_magic shop",
+        "originally: black_magic - now: see kelb's original black_magic shop",
+        "originally: dimen_magic - now: see kelb's original dimen_magic shop"
+    ],
+    "moore": [
+        "originally: item_1 - now: see regole's original item_1 shop",
+        "originally: item_2 - now: see regole's original item_2 shop",
+    ]
+}
+
 
 missable_shops_type_addresses: List[int] = list(shop_type_flag_memory_locations["walse"].values()) + list(shop_type_flag_memory_locations["istory"].values()) + list(shop_type_flag_memory_locations["lix"].values())
