@@ -329,23 +329,9 @@ def randomise_shop(shop_type_address: int) -> None:
 def select_shop_type() -> Tuple[int, int]:
     remaining_shop_types: List[int] = [elm for elm in useful_shop_types]
 
-    if len(weapon_codes) == 0:
-        remaining_shop_types.remove(shop_types["weapon"])
-    
-    if len(armor_codes) == 0:
-        remaining_shop_types.remove(shop_types["armor"])
-    
-    if len(item_codes) == 0:
-        remaining_shop_types.remove(shop_types["item"])
-    
-    if len(magic_codes) == 0:
-        remaining_shop_types.remove(shop_types["magic"])
-    
-    if len(accessory_codes) == 0:
-        remaining_shop_types.remove(shop_types["accessory"])
-    
-    if len(job_codes) == 0:
-        remaining_shop_types.remove(shop_types["job"])
+    for shop_type_name, goods_list in shop_goods_mappings.items():
+        if len(goods_list) == 0:
+            remaining_shop_types.remove(shop_types[shop_type_name])
 
     if len(remaining_shop_types) == 0:
         return 0x00, 0 # We force all the remaining shops to be magic shops (not that it matters).
@@ -372,24 +358,7 @@ def place_stuff_in_shop(shop_type: int, shop_type_address: int, remaining_entrie
     global ff5_bytes
 
     for i in range(1, min(remaining_entries_for_type + 1, 9)):
-        ff5_bytes[shop_type_address + i] = pop_good_code(shop_type=shop_type)
-
-
-def pop_good_code(shop_type: int) -> int:
-    if shop_type == shop_types["magic"]:
-        return magic_codes.pop()
-    elif shop_type == shop_types["weapon"]:
-        return weapon_codes.pop()
-    elif shop_type == shop_types["armor"]:
-        return armor_codes.pop()
-    elif shop_type == shop_types["item"]:
-        return item_codes.pop()
-    elif shop_type == shop_types["accessory"]:
-        return accessory_codes.pop()
-    elif shop_type == shop_types["job"]:
-        return job_codes.pop()
-    else:
-        raise ValueError("You should not be here! Unknown shop type code: {}".format(hex(shop_type)))
+        ff5_bytes[shop_type_address + i] = shop_goods_mappings[next(k for k, v in shop_types.items() if v == shop_type)].pop()
 
 
 def fill_leftover_spots(shop_type_address: int, remaining_entries_for_type: int) -> None:
