@@ -40,8 +40,14 @@ The compatibility with any other version (e.g., a [Career Day](https://www.bigbr
 
 ## HOWTO
 
-Run the following command, and follow the resulting instructions
+Run the following command, and follow the resulting instructions, in order to create a modded ROM and the corresponding spoilers file:
 
 ```console
 python3 shop_randomiser.py
+```
+
+Run the following command, and follow the resulting instructions, in order to create the spoiler file from a pre-existing ROM:
+
+```console
+python3 spoiler_log_only.py
 ```

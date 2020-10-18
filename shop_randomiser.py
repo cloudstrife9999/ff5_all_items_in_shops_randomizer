@@ -65,7 +65,7 @@ def main():
     save_data_to_rom(ff5_edited_bytes=ff5_bytes, rom_path=output_rom)
 
     spoiler_log: List[str] = generate_spoiler_log()
-    write_spoiler_log(spoiler_log=spoiler_log)
+    write_spoiler_log(spoiler_log=spoiler_log, output_file_path="{}.spoiler_log.txt".format(output_rom))
 
 
 def load_rom_data(rom_path: str) -> List[int]:
@@ -84,8 +84,11 @@ def save_data_to_rom(ff5_edited_bytes: List[int], rom_path: str) -> None:
         f.flush()
 
 
-def generate_spoiler_log() -> List[str]:
-    global ff5_bytes
+def generate_spoiler_log(ff5_bytes_ro: List[int]=None) -> List[str]:
+    if not ff5_bytes_ro:
+        global ff5_bytes
+    else:
+        ff5_bytes = ff5_bytes_ro
 
     spoiler_log: List[str] = []
 
@@ -209,8 +212,8 @@ def identify_job_class(good_code: int) -> "str":
     return "Unknown job class ({})".format(hex(good_code))
 
 
-def write_spoiler_log(spoiler_log: List[str]) -> None:
-    with open("ff5_randomiser_spoiler_log.txt", "w") as f:
+def write_spoiler_log(spoiler_log: List[str], output_file_path: str) -> None:
+    with open(output_file_path, "w") as f:
         for line in spoiler_log:
             f.write(line + "\n")
 
