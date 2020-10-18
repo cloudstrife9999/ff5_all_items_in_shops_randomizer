@@ -25,7 +25,7 @@ def parse_arguments() -> str:
         input_rom = os.path.join(os.getcwd(), input_rom)
 
     if not os.path.exists(input_rom):
-        print("{} does not  see to exist. Aborting.".format(input_rom))
+        print("{} does not seem to exist. Aborting.".format(input_rom))
         exit(-1)
 
     return input_rom

@@ -33,7 +33,7 @@ def parse_arguments() -> Tuple[str, str]:
         input_rom = os.path.join(os.getcwd(), input_rom)
 
     if not os.path.exists(input_rom):
-        print("{} does not  see to exist. Aborting.".format(input_rom))
+        print("{} does not seem to exist. Aborting.".format(input_rom))
         exit(-1)
 
     if not overwrite and os.path.isfile(output_rom):
@@ -41,7 +41,7 @@ def parse_arguments() -> Tuple[str, str]:
         exit(-1)
 
     if os.path.exists(output_rom) and not os.path.isfile(output_rom):
-        print("{} already exists, and it is not  a regular file. Aborting for safety.".format(output_rom))
+        print("{} already exists, and it is not a regular file. Aborting for safety.".format(output_rom))
 
     return input_rom, output_rom
 
@@ -132,7 +132,8 @@ def append_dummy_shops_data() -> List[str]:
 
     for dummy_shop_type, shops in dummy_shops.items():
         for _, shop_type_address in shops.items():
-            dummy_spoiler_log.append("Dummy {} shop (now an item shop) at {}:".format(dummy_shop_type, hex(shop_type_address)))
+            new_shop_type_name: str = next(k for k, v in shop_types.items() if v == ff5_bytes[shop_type_address])
+            dummy_spoiler_log.append("Originally: dummy {} shop - now: {} at {}:".format(dummy_shop_type, new_shop_type_name, hex(shop_type_address)))
 
             for good_code in [ff5_bytes[i] for i in range(shop_type_address + 1, shop_type_address + 9)]:
                 good_name: str = get_good_name_from_code_and_type(good_code=good_code, shop_type_address=shop_type_address)
@@ -146,21 +147,17 @@ def get_good_name_from_code_and_type(good_code: int, shop_type_address: int) -> 
         return "-"
     elif ff5_bytes[shop_type_address] == 0x00:
         return identify_magic(good_code=good_code)
-    elif ff5_bytes[shop_type_address] == 0x01:
-        return identify_weapon(good_code=good_code)
-    elif ff5_bytes[shop_type_address] == 0x02:
-        return identify_armor(good_code=good_code)
-    elif ff5_bytes[shop_type_address] == 0x03:
-        return identify_item(good_code=good_code)
-    elif ff5_bytes[shop_type_address] == 0x04:
-        return identify_accessory(good_code=good_code)
+    elif ff5_bytes[shop_type_address] in (0x01, 0x03, 0x05, 0x06, 0x81, 0x83):
+        return identify_mixed_weapon_item(good_code=good_code)
+    elif ff5_bytes[shop_type_address] in (0x02, 0x04, 0x82):
+        return identify_mixed_armor_accessory(good_code=good_code)
     elif ff5_bytes[shop_type_address] == 0x07:
         return identify_job_class(good_code=good_code)
     else:
         return "Unknown ({})".format(hex(good_code))
 
 
-def identify_magic(good_code: int) -> "str":
+def identify_magic(good_code: int) -> str:
     for _, magic_list in spells.items():
         for magic_name, magic_code in magic_list.items():
             if good_code == magic_code:
@@ -169,7 +166,7 @@ def identify_magic(good_code: int) -> "str":
     return "Unknown spell/summon/msword/song ({})".format(hex(good_code))
 
 
-def identify_weapon(good_code: int) -> "str":
+def identify_weapon(good_code: int) -> str:
     for _, weapon_list in weapons.items():
         for weapon_name, weapon_code in weapon_list.items():
             if good_code == weapon_code:
@@ -178,17 +175,22 @@ def identify_weapon(good_code: int) -> "str":
     return "Unknown weapon ({})".format(hex(good_code))
 
 
-def identify_armor(good_code: int) -> "str":
+def identify_mixed_armor_accessory(good_code: int) -> str:
     for _, armor_list in armors.items():
         for _, armor_sublist in armor_list.items():
             for armor_name, armor_code in armor_sublist.items():
                 if good_code == armor_code:
                     return armor_name
 
-    return "Unknown armor ({})".format(hex(good_code))
+    accessory: str = identify_accessory(good_code=good_code)
+
+    if not "Unknown" in accessory:
+        return accessory
+    else:
+        return "Unknown armor ({})".format(hex(good_code))
 
 
-def identify_item(good_code: int) -> "str":
+def identify_item(good_code: int) -> str:
     for item_name, item_code in items.items():
         if good_code == item_code:
             return item_name
@@ -196,7 +198,7 @@ def identify_item(good_code: int) -> "str":
     return "Unknown item ({})".format(hex(good_code))
 
 
-def identify_accessory(good_code: int) -> "str":
+def identify_accessory(good_code: int) -> str:
     for accessory_name, accessory_code in accessories.items():
         if good_code == accessory_code:
             return accessory_name
@@ -204,7 +206,21 @@ def identify_accessory(good_code: int) -> "str":
     return "Unknown accessory ({})".format(hex(good_code))
 
 
-def identify_job_class(good_code: int) -> "str":
+def identify_mixed_weapon_item(good_code: int) -> str:
+    weapon: str = identify_weapon(good_code=good_code)
+
+    if "Unknown" in weapon:
+        it: str = identify_item(good_code=good_code)
+
+        if "Unknown" in it:
+            return "Unknown weapon or item: ({})".format(hex(good_code))
+        else:
+            return it
+    else:
+        return weapon
+
+
+def identify_job_class(good_code: int) -> str:
     for job_name, job_code in jobs.items():
         if good_code == job_code:
             return job_name

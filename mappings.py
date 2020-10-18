@@ -7,12 +7,12 @@ shop_types: Dict[str, int] = {
     "armor": 0x02,
     "item": 0x03,
     "accessory": 0x04,
-    "throwables": 0x05, # Weapons + Throwable items (flame/water/thunder scroll)
-    "elixir": 0x06, # Items + Elixir
+    "throwable": 0x05, # Weapons + Throwable items (flame/water/thunder scroll)
+    "item_with_elixir": 0x06, # Items + Elixir
     "job": 0x07,
     "karnak_weapon_shop_before_getting_arrested": 0x81,
     "karnak_armor_shop_before_getting_arrested": 0x82,
-    "karnak_item_shop_before_getting_arrested": 0x83
+    "cheap_item": 0x83
 }
 
 useful_shop_types: list = [0x00, 0x01, 0x02, 0x03, 0x04, 0x07]
@@ -649,7 +649,7 @@ shop_type_flag_memory_locations: Dict[str, Dict[str, Union[int, Dict[str, int]]]
         "level_6_magic": 0x112F4A, # Level 6 spells.
         "missable_magic": 0x112F53, # Level 1/2/3 spells and Level 1 summons.
         "item_top": 0x112F5C,
-        "item_bottom": 0x112F65
+        "item_with_elixir": 0x112F65
     },
     "dummy": {
         "weapon": {
