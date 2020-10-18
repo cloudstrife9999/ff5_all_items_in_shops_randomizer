@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-from mappings import shop_type_flag_memory_locations, shop_types, useful_shop_types, missable_shops_type_addresses, shared_shops
+from mappings import shop_type_flag_memory_locations, shop_types, useful_shop_types, missable_shops_type_addresses, shared_shops, shop_goods_mappings
 from mappings import weapon_codes, armor_codes, accessory_codes, item_codes, magic_codes, job_codes
 from mappings import weapons, armors, accessories, items, spells, jobs
 
@@ -16,6 +16,7 @@ import os
 
 
 ff5_bytes: List[int] = []
+latest_selected_shop_type: int = -1
 
 
 def parse_arguments() -> Tuple[str, str]:
@@ -306,9 +307,10 @@ def manage_karnak_temporary_shop(shop_type_address: int) -> None:
 
 
 def randomise_shop(shop_type_address: int) -> None:
-    global ff5_bytes
+    global ff5_bytes, latest_selected_shop_type
 
     shop_type, remaining_entries_for_type = select_shop_type()
+    latest_selected_shop_type = shop_type
 
     assert shop_type is not None and remaining_entries_for_type >= 0
 
@@ -325,30 +327,45 @@ def randomise_shop(shop_type_address: int) -> None:
 
 
 def select_shop_type() -> Tuple[int, int]:
-    if len(weapon_codes) == 0 and len(armor_codes) == 0 and len(item_codes) == 0 and len(magic_codes) == 0:
+    remaining_shop_types: List[int] = [elm for elm in useful_shop_types]
+
+    if len(weapon_codes) == 0:
+        remaining_shop_types.remove(shop_types["weapon"])
+    
+    if len(armor_codes) == 0:
+        remaining_shop_types.remove(shop_types["armor"])
+    
+    if len(item_codes) == 0:
+        remaining_shop_types.remove(shop_types["item"])
+    
+    if len(magic_codes) == 0:
+        remaining_shop_types.remove(shop_types["magic"])
+    
+    if len(accessory_codes) == 0:
+        remaining_shop_types.remove(shop_types["accessory"])
+    
+    if len(job_codes) == 0:
+        remaining_shop_types.remove(shop_types["job"])
+
+    if len(remaining_shop_types) == 0:
         return 0x00, 0 # We force all the remaining shops to be magic shops (not that it matters).
     else:
-        return roll_shop_type()
+        return roll_shop_type(remaining_shop_types=remaining_shop_types)
 
 
-def roll_shop_type() -> Tuple[int, int]:
-    candidate = choice(useful_shop_types)
+def roll_shop_type(remaining_shop_types: List[int]) -> Tuple[int, int]:
+    assert len(remaining_shop_types) > 0
 
-    while True:
-        if candidate == shop_types["magic"] and len(magic_codes) > 0:
-            return candidate, len(magic_codes)
-        elif candidate == shop_types["weapon"] and len(weapon_codes) > 0:
-            return candidate, len(weapon_codes)
-        elif candidate == shop_types["armor"] and len(armor_codes) > 0:
-            return candidate, len(armor_codes)
-        elif candidate == shop_types["accessory"] and len(accessory_codes) > 0:
-            return candidate, len(accessory_codes)
-        elif candidate == shop_types["item"] and len(item_codes) > 0:
-            return candidate, len(item_codes)
-        elif candidate == shop_types["job"] and len(job_codes) > 0:
-            return candidate, len(job_codes)
-        else:
-            candidate = choice(useful_shop_types)
+    global latest_selected_shop_type
+
+    if len(remaining_shop_types) == 1:
+        candidate: int = remaining_shop_types[0]
+    elif not latest_selected_shop_type in remaining_shop_types:
+        candidate: int = choice(remaining_shop_types)
+    else:
+        candidate: int = choice([elm for elm in remaining_shop_types if elm != latest_selected_shop_type])
+
+    return candidate, len(shop_goods_mappings[next(k for k, v in shop_types.items() if v == candidate)])
 
 
 def place_stuff_in_shop(shop_type: int, shop_type_address: int, remaining_entries_for_type: int) -> None:
