@@ -76,6 +76,10 @@ def load_rom_data(rom_path: str) -> List[int]:
 
 def save_data_to_rom(ff5_edited_bytes: List[int], rom_path: str) -> None:
     assert not  os.path.exists(rom_path) or os.path.isfile(rom_path) # The check for --overwrite has been already performed.
+    assert ff5_edited_bytes is not None
+
+    for b in ff5_edited_bytes:
+        assert b is not None and type(b) == int and b >=0x00 and b <= 0xFF
 
     with open(rom_path, "wb") as f:
         for b in ff5_edited_bytes:
