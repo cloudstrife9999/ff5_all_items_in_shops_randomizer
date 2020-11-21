@@ -98,7 +98,7 @@ weapons: Dict["str", Dict["str", int]] = {
         "coral_sword": 0x10,
         "ancient_sword": 0x11,
         "slumber": 0x13, # Not a mistake --> the order is inverted.
-        "rune__edge": 0x56,
+        "rune_edge": 0x56,
         "epee": 0x12, # Not a mistake --> the order is inverted.
         "excailbur": 0x5C, # excalipoor
         "enhancer": 0x6E
@@ -559,7 +559,7 @@ shop_goods_mappings: Dict[str, str] = {
 }
 
 
-# The purchasable goods are located in the memory range [<address + 1> to <address + 9>] (extremes included)
+# The purchasable goods are located in the memory range [<address + 1> to <address + 8>] (extremes included)
 shop_type_flag_memory_locations: Dict[str, Dict[str, Union[int, Dict[str, int]]]] = {
     "tule": {
         "weapon": 0x112D40,

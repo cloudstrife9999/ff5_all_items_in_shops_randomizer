@@ -4,6 +4,7 @@
 from mappings import shop_type_flag_memory_locations, shop_types, useful_shop_types, missable_shops_type_addresses, shared_shops, shop_goods_mappings
 from mappings import weapon_codes, armor_codes, accessory_codes, item_codes, magic_codes, job_codes
 from mappings import weapons, armors, accessories, items, spells, jobs
+from fixed import fixed_mod
 
 from typing import Dict, Tuple, List
 from random import choice, shuffle, seed
@@ -24,11 +25,13 @@ def parse_arguments() -> Tuple[str, str]:
     parser.add_argument("-i", "--input_rom", type=str, metavar="input_rom", required=True)
     parser.add_argument("-o", "--output_rom", type=str, metavar="output_rom", required=True)
     parser.add_argument("--overwrite", action="store_true", required=False)
+    parser.add_argument("--fixed", action="store_true", required=False)
 
     args: Namespace = parser.parse_args()
     input_rom: str = args.input_rom
     output_rom: str = args.output_rom
     overwrite: str = args.overwrite
+    fixed: str = args.fixed
 
     if not os.path.isabs(input_rom):
         input_rom = os.path.join(os.getcwd(), input_rom)
@@ -44,16 +47,19 @@ def parse_arguments() -> Tuple[str, str]:
     if os.path.exists(output_rom) and not os.path.isfile(output_rom):
         print("{} already exists, and it is not a regular file. Aborting for safety.".format(output_rom))
 
-    return input_rom, output_rom
+    return input_rom, output_rom, fixed
 
 
 def main():
-    input_rom, output_rom = parse_arguments()
+    input_rom, output_rom, fixed = parse_arguments()
 
     global ff5_bytes
     ff5_bytes = load_rom_data(rom_path=input_rom)
 
-    randomise()
+    if fixed:
+        ff5_bytes = fixed_mod(ff5_bytes=ff5_bytes)
+    else:
+        randomise()
 
     # Everything free in every weapon/armor/item shop.
     for i in range(0x112A00, 0x112CFF + 1):
